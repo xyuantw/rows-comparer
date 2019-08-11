@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="icon" type="image/png" href="./favicon.png" />
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<style>
+body {
+    font-family: Calibri Light;
+}
+.hidden-textarea {
+    position: absolute;
+    left: -9999px;
+}
+</style>
+<title>Rows Comparer</title>
+</head>
+<body>
+    <div id="app">
+        <nav class="container-fluid navbar navbar-expand-lg navbar-light bg-light">
+            <div class="collapse navbar-collapse">
+                <div class="navbar-nav font-weight-bold">
+                    <a class="nav-item nav-link active pl-0" href="#">ROWS COMPARER</a>
+                </div>
+            </div>
+            <button class="btn btn-warning" @click="GetY">
+                <div><i class="fas fa-anchor"></i></div>
+            </button>
+            <button class="btn btn-danger ml-2" @click="GetStatus">
+                <div><i class="fas fa-flag-usa"></i></div>
+            </button>
+        </nav>
+        <div class="container-fluid">
+            <div class="row mt-1">
+                <div class="col-6 d-flex flex-column">
+                    <div class="form-group row mb-1">
+                        <div class="col-lg-8"></div>
+                        <div class="col-lg-4 d-flex justify-content-end">
+                        </div>
+                    </div>
+                    <textarea v-model="x" class="form-control" rows="48"></textarea>
+                </div>
+                <div class="col-6 d-flex flex-column">
+                    <div class="form-group row mb-2">
+                        <div class="col-lg-8"></div>
+                        <div class="col-lg-4 ml-auto d-flex justify-content-end">
+                        </div>
+                    </div>
+                    <textarea v-model="y" class="form-control" rows="48"></textarea>
+                </div>
+            </div>
+        </div>
+        <textarea id="resultTextarea1" class="hidden-textarea"></textarea>
+        <textarea id="resultTextarea2" class="hidden-textarea"></textarea>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/js/all.min.js"></script>
+
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                x: '',
+                y: '',
+                result1: '',
+                result2: ''
+            },
+            computed: {
+                xArray: function() {
+                    return this.x.split("\n");
+                },
+                isYcontainStatus: function() {
+                    var firstRow = this.y.split("\n")[0];
+                    if (firstRow.indexOf("\t") > -1) {
+                        return true;
+                    }else{
+                        return false;
+                    }
+                },
+                yArray: function() {
+                    var yArray = this.y.split("\n").filter(item => item !== "");
+                    if (this.isYcontainStatus){
+                        var tempArray = [];
+                        yArray.forEach(element => {
+                            tempArray.push(element.split("\t")[0]);
+                        });
+                        return tempArray;
+                    }
+                    return yArray;
+                },
+                statusArray: function() {
+                    if (this.isYcontainStatus) {
+                        var yArray = this.y.split("\n").filter(item => item !== "");
+                        var statusArray = [];
+                        yArray.forEach(element => {
+                            statusArray.push(element.split("\t")[1]);
+                        });
+                        return statusArray;
+                    }
+                    return [];
+                }
+            },
+            methods: {
+                GetY: function() {
+                    this.compareXtoY();
+                    this.copyYResult();
+                },
+                GetStatus: function() {
+                    this.compareXtoY();
+                    this.copyStatusResult();
+                },
+                compareXtoY: function() {
+                    var resultArray1 = [];
+                    var resultArray2 = [];
+                    this.xArray.forEach((element, index) => {
+                        if (this.yArray.indexOf(element) > -1){
+                            resultArray1.push(element);
+                            resultArray2.push(this.statusArray[index]);
+                        }else{
+                            resultArray1.push("N/A");
+                            resultArray2.push("N/A");
+                        }
+                    });
+                    this.result1 = resultArray1.join("\n");
+                    this.result2 = resultArray2.join("\n");
+                },
+                copyYResult: function() {
+                    document.getElementById("resultTextarea1").value = this.result1;
+                    document.getElementById("resultTextarea1").select();
+                    document.execCommand("copy");
+                },
+                copyStatusResult: function() {
+                    document.getElementById("resultTextarea2").value = this.result2;
+                    document.getElementById("resultTextarea2").select();
+                    document.execCommand("copy");
+                }
+            }
+        });
+    </script>
+</body>
+</html>
