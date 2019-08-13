@@ -118,9 +118,10 @@ body {
                     var resultArray1 = [];
                     var resultArray2 = [];
                     this.xArray.forEach((element, index) => {
-                        if (this.yArray.indexOf(element) > -1){
+                        var matchYIndex = this.yArray.indexOf(element);
+                        if (matchYIndex > -1){
                             resultArray1.push(element);
-                            resultArray2.push(this.statusArray[index]);
+                            resultArray2.push(this.statusArray[matchYIndex]);
                         }else{
                             resultArray1.push("N/A");
                             resultArray2.push("N/A");
